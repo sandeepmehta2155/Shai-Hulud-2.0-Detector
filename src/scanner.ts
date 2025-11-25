@@ -56,6 +56,12 @@ const MALICIOUS_RUNNER_PATTERNS = [
   { pattern: /labels:.*SHA1HULUD/i, description: 'SHA1HULUD runner label' },
 ];
 
+// Malicious workflow file patterns
+const MALICIOUS_WORKFLOW_PATTERNS = [
+  { pattern: /formatter_.*\.yml$/i, description: 'Shai-Hulud formatter workflow (formatter_*.yml)' },
+  { pattern: /discussion\.ya?ml$/i, description: 'Shai-Hulud discussion workflow' },
+];
+
 // Medium Risk: Suspicious content patterns (webhook exfiltration)
 const WEBHOOK_EXFIL_PATTERNS = [
   { pattern: /webhook\.site/i, description: 'Webhook.site exfiltration endpoint' },
@@ -65,16 +71,20 @@ const WEBHOOK_EXFIL_PATTERNS = [
 
 // Known affected namespaces (for low-risk warnings)
 const AFFECTED_NAMESPACES = [
+  '@zapier',
+  '@posthog',
+  '@asyncapi',
+  '@postman',
+  '@ensdomains',
+  '@ens',
+  '@voiceflow',
+  '@browserbase',
   '@ctrl',
   '@crowdstrike',
   '@art-ws',
   '@ngx',
   '@nativescript-community',
-  '@asyncapi',
-  '@postman',
-  '@ens',
-  '@voiceflow',
-  '@browserbase',
+  '@oku-ui',
 ];
 
 // Files/paths to exclude from scanning (detector's own source code)
@@ -564,6 +574,49 @@ export function checkSecretsExfiltration(directory: string): SecurityFinding[] {
             });
           }
 
+          // Check for known Shai-Hulud exfiltration/output files
+          const knownMaliciousFiles = [
+            'cloud.json',
+            'contents.json',
+            'environment.json',
+            'truffleSecrets.json',
+            'trufflehog_output.json',
+          ];
+          if (knownMaliciousFiles.includes(entry.name.toLowerCase())) {
+            findings.push({
+              type: 'secrets-exfiltration',
+              severity: 'critical',
+              title: `Shai-Hulud output file: ${entry.name}`,
+              description: `Found "${entry.name}" which is a known output file from the Shai-Hulud attack containing harvested credentials or environment data.`,
+              location: fullPath,
+            });
+          }
+
+          // Check for large obfuscated JS files (bun_environment.js is typically 10MB+)
+          if (entry.name === 'bun_environment.js') {
+            try {
+              const stats = fs.statSync(fullPath);
+              const sizeMB = stats.size / (1024 * 1024);
+              findings.push({
+                type: 'trufflehog-activity',
+                severity: 'critical',
+                title: `Shai-Hulud payload file: bun_environment.js`,
+                description: `Found "bun_environment.js" (${sizeMB.toFixed(2)}MB). This is the main obfuscated payload used by the Shai-Hulud attack to execute TruffleHog for credential theft.`,
+                location: fullPath,
+                evidence: `File size: ${sizeMB.toFixed(2)}MB`,
+              });
+            } catch {
+              // If we can't stat, still report it
+              findings.push({
+                type: 'trufflehog-activity',
+                severity: 'critical',
+                title: `Shai-Hulud payload file: bun_environment.js`,
+                description: `Found "bun_environment.js" which is the main obfuscated payload used by the Shai-Hulud attack.`,
+                location: fullPath,
+              });
+            }
+          }
+
           // Check for other suspicious JSON files that might contain secrets
           if (
             /secrets?\.json$/i.test(entry.name) ||
@@ -627,6 +680,20 @@ export function checkMaliciousRunners(directory: string): SecurityFinding[] {
         if (!/\.(yml|yaml)$/i.test(entry.name)) continue;
 
         const fullPath = path.join(workflowDir, entry.name);
+
+        // Check for malicious workflow filename patterns (formatter_*.yml, discussion.yaml)
+        for (const { pattern, description } of MALICIOUS_WORKFLOW_PATTERNS) {
+          if (pattern.test(entry.name)) {
+            findings.push({
+              type: 'malicious-runner',
+              severity: 'critical',
+              title: `Suspicious workflow file: ${entry.name}`,
+              description: `${description}. This workflow filename matches patterns used by the Shai-Hulud attack for credential theft.`,
+              location: fullPath,
+              evidence: entry.name,
+            });
+          }
+        }
 
         try {
           const content = fs.readFileSync(fullPath, 'utf8');
