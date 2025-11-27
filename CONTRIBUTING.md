@@ -161,10 +161,10 @@ npm run build
 
 ```bash
 # Set environment variables to simulate inputs
-export INPUT_FAIL-ON-CRITICAL=true
-export INPUT_SCAN-LOCKFILES=true
-export INPUT_OUTPUT-FORMAT=text
-export INPUT_WORKING-DIRECTORY=/path/to/test/project
+export INPUT_FAIL_ON_CRITICAL=true
+export INPUT_SCAN_LOCKFILES=true
+export INPUT_OUTPUT_FORMAT=text
+export INPUT_WORKING_DIRECTORY=/path/to/test/project
 
 # Run the action
 node dist/index.js
