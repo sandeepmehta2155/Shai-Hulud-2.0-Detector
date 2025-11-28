@@ -64,6 +64,7 @@
 - [FAQ](#faq)
 - [Contributing](#contributing)
 - [Acknowledgments](#acknowledgments)
+- [Thanks](#thanks)
 - [License](#license)
 
 ---
@@ -1142,6 +1143,25 @@ This project builds on the excellent work of security researchers who identified
 ### Community
 
 Thanks to everyone who reported affected packages, tested the detector, and helped spread awareness about this attack.
+
+---
+
+## Thanks
+
+A huge thank you to all the community members who have contributed to this project through code, issue reports, and discussions:
+
+| Contributor | Contributions |
+|-------------|---------------|
+| [@albe](https://github.com/albe) | Pull requests |
+| [@gaellafond](https://github.com/gaellafond) | Issue reports |
+| [@julia-infocaster](https://github.com/julia-infocaster) | Code contributions, Pull requests |
+| [@luca-cond](https://github.com/luca-cond) | Discussions |
+| [@maxie7](https://github.com/maxie7) | Code contributions, Pull requests, Discussions |
+| [@sampov2](https://github.com/sampov2) | Discussions |
+| [@seezee](https://github.com/seezee) | Issue reports, False positive identification |
+| [@topsinfonimesh](https://github.com/topsinfonimesh) | Discussions |
+
+Your contributions help protect millions of developers worldwide. 🙏
 
 ---
 
