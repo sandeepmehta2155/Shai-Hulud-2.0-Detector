@@ -303,8 +303,8 @@ async function run(): Promise<void> {
 			}
 		}
 
-		// Create job summary if there are any issues
-		if (hasIssues) {
+		// Create job summary if there are any issues (only in GitHub Actions)
+		if (hasIssues && isRunningInGithubActions()) {
 			await createJobSummary(summary);
 		}
 
