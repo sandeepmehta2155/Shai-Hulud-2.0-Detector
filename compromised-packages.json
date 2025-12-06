@@ -1,6 +1,6 @@
 {
   "version": "2.0.0",
-  "lastUpdated": "2025-12-02T14:33:33.863Z",
+  "lastUpdated": "2025-12-06T01:43:10.273Z",
   "dataSource": {
     "url": "https://github.com/DataDog/indicators-of-compromise/tree/main/shai-hulud-2.0",
     "description": "Consolidated IOCs from multiple security vendors",
@@ -13,7 +13,7 @@
       "stepsecurity",
       "wiz"
     ],
-    "fetchedAt": "2025-12-02T14:33:33.863Z"
+    "fetchedAt": "2025-12-06T01:43:10.273Z"
   },
   "attackInfo": {
     "name": "Shai-Hulud 2.0",
